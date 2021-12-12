@@ -1,0 +1,261 @@
+﻿@using BusinessManager.ViewModels
+@using BusinessManager.DomainClasses
+
+@model IEnumerable<Moshtari>
+
+@{
+    ViewData["Title"] = "لیست مشتری ها";
+}
+
+<div class="row">
+    <nav class="col-1 ml-1 navbar navbar-expand-lg">
+        <div class="">
+            <button type="button" id="sidebarCollapse" class="btn-outline-primary active ">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+    <div class="search-simbol mt-3"><i class="fas fa-search"></i></div>
+    <div class="col-md-3 search-element"><input id="Search-name" class="main-element border rounded" placeholder="@Html.DisplayNameFor(model => model.Nam)" /></div>
+    <div class="col-md-3 search-element"><input id="Search-family" class="main-element border rounded" placeholder="@Html.DisplayNameFor(model => model.Family)" /></div>
+    <div class="col-md-3 search-element"><input id="Search-number" class="main-element border rounded" type="number" min="1" placeholder="@Html.DisplayNameFor(model => model.Radif)" /></div>
+    <div class="col-md-1 search-element text-right">
+        <a class="btn btn-outline-primary" id="clearSrearch"><i class="fas fa-1x fa-eraser "></i></a>
+    </div>
+</div>
+
+<div id="main">
+    <div class="table-box t-center">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th class="d-none">@Html.DisplayNameFor(model => model.Id)</th>
+                    <th class="x5">@Html.DisplayNameFor(model => model.Nam)</th>
+                    <th class="x5">@Html.DisplayNameFor(model => model.Family)</th>
+                    <th class="x3 pr-0">@Html.DisplayNameFor(model => model.Radif)</th>
+                    <th class="x2" style="padding: 0.35rem 0 0.35rem 0;">
+                        <a class="btn btn-outline-primary" id="addCustomer" data-toggle="modal" data-keyboard="true" data-target="#AddEdit-Modal">افزودن <i class="fas fa-plus-square"></i></a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+        <div class="scroll-30">
+            <table class="table table-striped">
+                <tbody id="Rows">
+                    @*@foreach (var item in Model)
+                        {
+                            <tr id="custtomer-@item.Id" class="row-table">
+                                <td class="d-none Id" >@item.Id</td>
+                                <td class="x5 name">@item.Nam</td>
+                                <td class="x5 family">@item.Family</td>
+                                <td class="x3 number">@item.Radif</td>
+                                <td class="x1">
+                                    <a class="font" asp-controller="Moshtaris" asp-action="Detail" asp-route-moshtariId="@(item.Id)">
+                                        <i class="fas fa-address-book account-customer"></i>
+                                    </a>
+                                </td>
+                                <td class="x1"><i class="fas fa-edit edit-customer" data-toggle="modal" data-target="#AddEdit-Modal"></i></td>
+                                <td class="x1"><i class="fas fa-trash-alt delete-customer" id="delte@(item.Id)"></i></td>
+                                <td class="x1"><i class="fas fa-info-circle details-customer"></i>
+                                </td>
+                            </tr>
+                        }*@
+
+                    @await Component.InvokeAsync("SearchResultMoshtari", new AddMoshtariViewModel { Nam = "", Family = "", Radif = 0 })
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal-->
+<div class="modal fade hide" id="AddEdit-Modal" role="dialog" data-backdrop="false" style="background:rgba(0,0,0,0.5);" tabindex="-1">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-window-close close ml-0 " data-dismiss="modal" style="color:red"></i>
+                <input id="Modal-Id" type="hidden" value="" />
+
+                <div class="w-100 text-center">
+                    <h4 class="modal-title text-center">ویرایش</h4>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row m-3">
+                    <div class="col-md-4"><label for="name">@Html.DisplayNameFor(model => model.Nam) :</label></div>
+                    <div class="col-md-8 "><input id="Name" class="w-100 text-center border rounded " name="firstName" type="text" value="" /></div>
+                </div>
+                <div class="row m-3">
+                    <div class="col-md-4"><label for="family"> @Html.DisplayNameFor(model => model.Family):</label></div>
+                    <div class="col-md-8"><input id="Family" class="w-100 text-center border rounded " name="LastName" type="text" value="" /></div>
+                </div>
+                <div class="row m-3">
+                    <div class="col-md-4"><label for="number">@Html.DisplayNameFor(model => model.Radif):</label></div>
+                    <div class="col-md-8"><input id="Number" type="number" min="1" class="w-100 text-center border rounded" name="Number" type="text" value="" /></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="Submit-Moshtari" type="button" class="btn btn-success">
+                    <span>ثبت <i class="far fa-save"></i></span>
+                    <img class="d-none" id="loading" src="~/img/loading.gif" style="width: 45px; margin: 0px 13px;" />
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+
+        function Loadlist() {
+            var number = $('#Search-number').val();
+            var family = $('#Search-family').val();
+            var name = $('#Search-name').val();
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Search", "Moshtaris")',
+                data: { name: name, family: family, number: number },
+                success: function (response) {
+                    $('#Rows').html(response);
+                },
+                error: function (error) {
+                    //error
+                }
+            })
+        }
+
+        $('.search-element .main-element').on('keyup', function () {
+            Loadlist();
+        });
+
+        $('#Submit-Moshtari').on('click', function () {
+            $('#loading').removeClass('d-none');
+            $('#Submit-Moshtari').addClass('p-0');
+            $('#Submit-Moshtari > span').addClass('d-none');
+
+
+            var ModelId = $('#Modal-Id').val();
+            var Nam = $('#Name').val();
+            var Family = $('#Family').val();
+            var Radif = $('#Number').val();
+
+            var postData = {
+                'Id': ModelId,
+                'Nam': Nam,
+                'Family': Family,
+                'Radif': Radif
+            }
+
+            $.ajax({
+                type: "POST",
+
+                url: '@Url.Action("Create", "Moshtaris")',
+                //contentType: "application/json; charset=utf-8",
+                //dataType: "json",
+                data: postData,
+                //beforeSend: function (xhr) {
+                //    xhr.setRequestHeader("XSRF-TOKEN",
+                //        $('input:hidden[name="__RequestVerificationToken"]').val());
+                //},
+                success: function (response) {
+
+                    $('#loading').addClass('d-none');
+                    $('#Submit-Moshtari').removeClass('p-0');
+                    $('#Submit-Moshtari > span').removeClass('d-none');
+
+                    if (response.success == "true") {
+                        swal({ title: "عملیات با موفقیت انجام شد", text: "", icon: "success", button: "بسیار خب" })
+                            .then((value) => {
+                                location.reload();
+                            });
+
+                    } else {
+                        swal({ title: "", text: response.error, icon: "error", button: "بسیار خب" });
+
+                    }
+                },
+                error: function (error) {
+                    //error
+                }
+            })
+
+
+
+        })
+
+        function deleteCustomer(Customerid) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Delete", "Moshtaris")',
+                data: { id: Customerid },
+                success: function (response) {
+                    if (response.success == "true") {
+                        swal({ title: "حذف انجام شد", text: "", icon: "success", button: "بسیار خب" });
+                        $('#custtomer-' + Customerid).remove();
+                    } else {
+                        swal({ title: "", text: response.error, icon: "error", button: "بسیار خب" });
+                    }
+                },
+                error: function (error) {
+                    //error
+                }
+            })
+        }
+
+        $('#Rows').on('click','.delete-customer', function () {
+            var thisId = $(this).parents('.row-table').children('.Id').html();
+            swal({
+                title: "هشدار",
+                text: "آیا مطمئن هستید؟",
+                icon: "warning",
+                buttons: {
+                    cancel: "خیر",
+                    Yes: {
+                        text: "بله",
+                        value: "Yes",
+                    },
+                },
+            }).then((value) => {
+                switch (value) {
+                    case "Yes":
+                        deleteCustomer(thisId)
+
+                        break;
+                    default:
+                        break;
+                }
+            });
+        });
+
+        $('#clearSrearch').on('click', function () {
+            $('.search-element input.main-element').val('');
+            Loadlist();
+        });
+
+        $('#addCustomer').on('click', function () {
+            $('.modal-content .modal-body input').val('');
+            $('.modal-content #Modal-Id').val('');
+            $('.modal-content .modal-title').html('افزودن');
+        });
+
+        $('#Rows').on('click','.edit-customer', function () {
+            var row = $(this).parents('.row-table');
+            $('.modal-content .modal-title').html('ویرایش اطلاعات مشتری');
+            $('.modal-content #Modal-Id').val(row.children('.Id').html());
+            $('.modal-content .modal-body input[name=firstName]').val(row.children('.name').html());
+            $('.modal-content .modal-body input[name=LastName]').val(row.children('.family').html());
+            $('.modal-content .modal-body input[name=Number]').val(row.children('.number').html());
+        });
+    </script>
+}
+
+
+
+

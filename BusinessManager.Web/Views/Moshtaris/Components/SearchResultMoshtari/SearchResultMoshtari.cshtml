@@ -1,0 +1,21 @@
+﻿@model IEnumerable<BusinessManager.DomainClasses.Moshtari>
+@foreach (var item in Model)
+{
+    <tr id="custtomer-@item.Id" class="row-table">
+        <td class="d-none Id">@item.Id</td>
+        <td class="x5 name">@item.Nam</td>
+        <td class="x5 family">@item.Family</td>
+        <td class="x3 number">@item.Radif</td>
+        <td class="x1">
+            <a class="font" asp-controller="Moshtaris" asp-action="HesabMoshtari" asp-route-moshtariId="@(item.Id)">
+                <i class="fas fa-address-book account-customer"></i>
+            </a>
+        </td>
+        <td class="x1"><i class="fas fa-edit edit-customer" data-toggle="modal" data-target="#AddEdit-Modal"></i></td>
+        <td class="x1"><i class="fas fa-trash-alt delete-customer" id="delte@(item.Id)"></i></td>
+        <td class="x1">
+            <i class="fas fa-info-circle details-customer"></i>
+        </td>
+    </tr>
+}
+

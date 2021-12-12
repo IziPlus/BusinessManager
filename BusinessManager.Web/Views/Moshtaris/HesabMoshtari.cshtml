@@ -1,0 +1,301 @@
+﻿@using BusinessManager.DomainClasses
+@using BusinessManager.Utilites.Convertor
+@model IEnumerable<HesabMoshtari>
+
+@{
+    ViewData["Title"] = "حساب مشتری";
+    Moshtari moshtari = ViewData["Moshtari"] as Moshtari;
+}
+
+<div class="row">
+    <nav class="col-1 navbar navbar-expand-lg">
+        <div class="">
+            <button type="button" id="sidebarCollapse" class="btn-outline-primary active ">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+    <input type="hidden" id="moshtari-id" value="@moshtari.Id" />
+    <div class="col-md-9 search-element text-center"><h4>@moshtari.Nam @moshtari.Family</h4></div>
+    <div class="col-md-2 search-element text-center"><h4>@moshtari.Radif</h4></div>
+</div>
+
+<div id="main">
+    <div class="table-box">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th class="x3">@Html.DisplayNameFor(model => model.dateShamsi)</th>
+                    <th class="x5">@Html.DisplayNameFor(model => model.Description)</th>
+                    <th class="x3">@Html.DisplayNameFor(model => model.Debtor)</th>
+                    <th class="x3">@Html.DisplayNameFor(model => model.Creditor)</th>
+                    <th class="x3">@Html.DisplayNameFor(model => model.Remaining)</th>
+                    <th class="x2" style="padding: 0.35rem 0 0.35rem 0;">
+                        <a class="btn btn-outline-primary" id="addCustomerAccount" data-toggle="modal" data-keyboard="true" data-target="#AddEdit-Modal">افزودن <i class="fas fa-plus-square"></i></a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+        <div class="scroll-30">
+            <table class="table table-striped">
+                <tbody id="rows" class="stripes">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="row-table" id="hesab-@item.Id">
+                            <td class="d-none Id" >@item.Id</td>
+                            <td class="x3 date">@item.dateShamsi</td>
+                            <td class="x5 descrption">@item.Description</td>
+                            <td class="x3 debtor">@item.Debtor</td>
+                            <td class="x3 Creditor">@item.Creditor</td>
+                            <td class="x3 remaining">@item.Remaining</td>
+                            <td class="x2"><i class="fas fa-trash-alt delete-row"></i></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal-->
+<div class="modal fade hide" id="AddEdit-Modal" role="dialog" data-backdrop="false" style="background:rgba(0,0,0,0.5);" tabindex="-1">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-window-close close ml-0 " data-dismiss="modal" style="color:red"></i>
+                <input type="hidden" id="main-remaining" value=""/>
+                <div class="w-100 text-center">
+                    <h4 class="modal-title text-center">افزودن</h4>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row m-3">
+                    @{ 
+                        
+                    }
+                    <div class="col-md-3"><label for="date">@Html.DisplayNameFor(model => model.dateShamsi):</label></div>
+                    <div class="col-md-8 ">
+                        <input id="date" class="w-100 text-center border rounded " name="date" type="text" 
+                               value="@DateTime.Now.ToShamsi()" />
+                    </div>
+                </div>
+                <div class="row m-3 align-items-center">
+                    <div class="col-md-3">
+                        <label for="descrption">
+                            @Html.DisplayNameFor(model => model.Description):
+
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <input id="descrption" class="w-100 text-center border rounded" name="descrption" type="text" value="" />
+                    </div>
+                    <i id="use-pattern" class="font fas fa-feather-alt"></i>
+                </div>
+                <div class="row m-3">
+                    <div class="col-md-3"><label for="debtor">@Html.DisplayNameFor(model => model.Debtor):</label></div>
+                    <div class="col-md-8">
+                    <input id="debtor" class="thousand-separator w-100 text-center border rounded " name="debtor" type="text" value="" /></div>
+                </div>
+
+                <div class="row m-3">
+                    <div class="col-md-3"><label for="Creditor">@Html.DisplayNameFor(model => model.Creditor):</label></div>
+                    <div class="col-md-8">
+                    <input id="Creditor" class="thousand-separator w-100 text-center border rounded" name="Creditor" type="text" value="" /></div>
+                </div>
+
+                <div class="row m-3 align-items-center">
+                    <div class="col-md-3"><label for="remaining">@Html.DisplayNameFor(model => model.Remaining):</label></div>
+                    <div class="col-md-8">
+                        <input id="remaining" class="thousand-separator w-100 text-center border rounded" name="remaining" type="text" value="" />
+                    </div>
+                    <i id="calculate" class="font fas fa-calculator"></i>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="submit-hesabMoshtari" type="button" class="btn btn-success">
+                    <span>ثبت <i class="far fa-save"></i></span>
+                    <img class="d-none" id="loading" src="~/img/loading.gif" style="width: 45px; margin: 0px 13px;" />
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+
+        $('#rows').on('click', '.delete-row', function () {
+            var thisId = $(this).parents('.row-table').children('.Id').html();
+            swal({
+                title: "هشدار",
+                text: "آیا مطمئن هستید؟",
+                icon: "warning",
+                buttons: {
+                    cancel: "خیر",
+                    Yes: {
+                        text: "بله",
+                        value: "Yes",
+                    },
+                },
+            }).then((value) => {
+                switch (value) {
+                    case "Yes":
+                        deletehesab(thisId)
+
+                        break;
+                    default:
+                        break;
+                }
+            });
+        });
+
+        function deletehesab(hesabid) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("DeleteHesab", "Moshtaris")',
+                data: { id: hesabid },
+                success: function (response) {
+                    if (response.success == "true") {
+                        swal({ title: "حذف انجام شد", text: "", icon: "success", button: "بسیار خب" });
+                        $('#hesab-' + hesabid).remove();
+                    } else {
+                        swal({ title: "", text: response.error, icon: "error", button: "بسیار خب" });
+                    }
+                },
+                error: function (error) {
+                    //error
+                }
+            })
+        }
+
+        $('#submit-hesabMoshtari').on('click', function () {
+            $('#loading').removeClass('d-none');
+            $('#submit-hesabMoshtari').addClass('p-0');
+            $('#submit-hesabMoshtari > span').addClass('d-none');
+
+            calculate();
+
+            var debtor = $('#debtor').val();
+            if (debtor=="") {
+                debtor = "0";
+            }
+            var Creditor=$('#Creditor').val();
+            if (Creditor == "") {
+                Creditor = "0";
+            }
+
+            var postData = {
+                'MoshtariId': $('#moshtari-id').val(),
+                'dateShamsi': $('#date').val(),
+                'Description': $('#descrption').val(),
+                'Debtor': debtor,
+                'Creditor': Creditor,
+                'Remaining': $('#remaining').val(),
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddHesab", "Moshtaris")',
+                //contentType: "application/json; charset=utf-8",
+                //dataType: "json",
+                data: postData,
+                //beforeSend: function (xhr) {
+                //    xhr.setRequestHeader("XSRF-TOKEN",
+                //        $('input:hidden[name="__RequestVerificationToken"]').val());
+                //},
+                success: function (response) {
+
+                    $('#loading').addClass('d-none');
+                    $('#submit-hesabMoshtari').removeClass('p-0');
+                    $('#submit-hesabMoshtari > span').removeClass('d-none');
+
+                    if (response.success == "true") {
+                        swal({ title: "عملیات با موفقیت انجام شد", text: "", icon: "success", button: "بسیار خب" })
+                            .then((value) => {
+                                location.reload();
+                            });
+
+                    } else {
+                        swal(response.error);
+                    }
+                },
+                error: function (error) {
+                    //error
+                }
+            })
+
+
+
+        })
+
+        $('#use-pattern').on('click', function () {
+            $('#descrption').val('بابت بدهی');
+        })
+
+        
+
+        function addCommas(value) {
+            var val = value;
+            val = val.replace(/,/g, '');
+                var R = new RegExp('(-?[0-9]+)([0-9]{3})');
+            while (R.test(val)) {
+                val = val.replace(R, '$1,$2');
+            }
+            return val;
+        }   
+        
+        function intParser(str) {
+            var tem = str.replace(/,/gi, "");
+            var result = Number(tem);
+            return result;
+        }
+
+        $('.thousand-separator').on('keyup', function () {
+            $(this).val(addCommas($(this).val()));
+        })
+
+        $('#addCustomerAccount').on('click', function () {
+            $('.modal-content .modal-body input').val('');
+            $('#date').val('@DateTime.Now.ToShamsi()');
+
+            $('#remaining').val($('#rows tr:first-child .remaining').html());
+            $('#main-remaining').val($('#rows tr:first-child .remaining').html());
+        })
+
+                //    var dep = intParser($('#debtor').val());
+        //    var rem = intParser($('#main-remaining').val());
+        //    var res = rem + dep;
+        //    $('#remaining').val(addCommas(res.toString()));
+        //})
+        //$('#debtor').on('change', function () { 
+        //    $('#main-remaining').val($('#remaining').val());
+        //})
+        //$('#Creditor').on('change', function () {
+        //    $('#main-remaining').val($('#remaining').val());
+        //})
+        $('#calculate').on('click', function () {
+            calculate();
+        })
+        function calculate() {
+            var Cred = intParser($('#Creditor').val());
+            var dep = intParser($('#debtor').val());
+            var rem = intParser($('#main-remaining').val());
+            var res = rem + dep - Cred;
+            $('#remaining').val(addCommas(res.toString()));
+        }
+        //$('#Creditor').on('keyup', function () {//کاهش دهنده بدهی
+        //    var Cred = intParser($('#Creditor').val());
+        //    var rem = intParser($('#main-remaining').val());
+        //    var res = rem - Cred;
+        //    $('#remaining').val(addCommas(res.toString()));
+        //})
+
+    </script>
+}

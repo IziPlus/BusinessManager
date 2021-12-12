@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/Content/css/bootstrap-datepicker.css" />
+    <link rel="stylesheet" href="/Content/css/page.css">
+    <link rel="stylesheet" href="/Content/fontawesome-5.5.0-web/css/all.css">
+    <link rel="stylesheet" href="/Content/css/bootstrap-4.1.3/bootstrap.css">
+    @RenderSection("Styles", false)
+
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- Sidebar  -->
+        <nav id="sidebar">
+            <div class="sidebar-header text-center m-0">
+                @*<h3>فروشگاه گلچین</h3>*@
+                <img src="~/img/logoGolchin.png"/>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a asp-controller="Moshtaris" asp-action="Index">مشتریان</a>
+                </li>
+                <li>
+                    <a href="#">فروشندگان</a>
+                </li>
+            </ul>
+
+        </nav>
+
+        <!-- Page Content  -->
+        <div id="content" class="container-fluid">
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="/Content/js/jquery-3.3.1.js"></script>
+    <script src="/Content/js/bootstrap-4.1.3/bootstrap.js"></script>
+    <script src="/Content/js/sweetalert.min.js"></script>
+    <script src="/Content/js/jquery.nicescroll.min.js"></script>
+    <script src="/Content/js/bootstrap-datepicker.min.js"></script>
+    <script src="/Content/js/bootstrap-datepicker.fa.min.js"></script>
+
+    @RenderSection("Scripts", false)
+    <script src="/Content/js/page.js"></script>
+</body>
+</html>
